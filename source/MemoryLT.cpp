@@ -319,9 +319,9 @@ namespace mlt
 				#if defined(TRACK_STACK_TRACE)
 				if (rec->m_trackStackTrace)
 				{
-					std::cout << "[memory] LEAK: HEAP allocation leak at address ";
+					std::cout << "[memory] LEAK: At address ";
 					std::cout << rec->m_address;
-					std::cout << " of size ";
+					std::cout << ", size ";
 					std::cout << rec->m_size << ":\n";
 					PrintStackTrace(rec);
 				}
@@ -329,19 +329,19 @@ namespace mlt
 				{
 					if (strlen(rec->m_file) > 0)
 					{
-						std::cout << "[memory] LEAK: HEAP allocation leak at address " << rec->m_address;
-						std::cout << " of size " << rec->m_size;
-						std::cout << " from line " << rec->m_line;
-						std::cout << " in file ' " << rec->m_file << "'.\n";
+						std::cout << "[memory] LEAK: At address " << rec->m_address;
+						std::cout << ", size " << rec->m_size;
+                        std::cout << ", in " << rec->m_file;
+                        std::cout << ":" << rec->m_line << " .\n";
 					}
 				}
 				#else
 				if (strlen(rec->m_file) > 0)
 				{
-					std::cout << "[memory] LEAK: HEAP allocation leak at address " << rec->m_address;
-					std::cout << " of size " << rec->m_size;
-					std::cout << " from line " << rec->m_line;
-					std::cout << " in file ' " << rec->m_file << "'.\n";
+                    std::cout << "[memory] LEAK: At address " << rec->m_address;
+                    std::cout << ", size " << rec->m_size;
+                    std::cout << ", in " << rec->m_file;
+                    std::cout << ":" << rec->m_line << " .\n";
 				}
 				#endif
 				rec = rec->m_next;

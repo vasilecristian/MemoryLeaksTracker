@@ -108,10 +108,10 @@ namespace mlt
 
 #if defined(_WIN32)
     #define	NEW new(__FILE__, __LINE__)
-    #define PRINTMEMORYLEAKS	atexit(mlt::PrintMemoryLeaks)
+    #define PRINT_MEMORY_LEAKS_AT_EXIT	atexit(mlt::PrintMemoryLeaks)
 #else
     #define NEW	new
-	#define PRINTMEMORYLEAKS
+    #define PRINT_MEMORY_LEAKS_AT_EXIT
 #endif//_WIN32
 
 
@@ -140,11 +140,13 @@ namespace mlt
     {
         free(ptr);
     }
+
+    void PrintMemoryLeaks(){}
 }
 
 //just declare the NEW
 #define NEW	new  
-#define PRINTMEMORYLEAKS
+#define PRINT_MEMORY_LEAKS_AT_EXIT
 
 #endif //_DEBUG
 
