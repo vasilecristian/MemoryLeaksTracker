@@ -1,13 +1,17 @@
 #ifndef __MEMORYLT_H_INCLUDED__
 #define __MEMORYLT_H_INCLUDED__
 
-#if defined(_DEBUG)
+#define MY_DEBUG
+#if defined(MY_DEBUG)
 
 #if defined(_WIN32) && !(defined(WINAPI_FAMILY) && ((WINAPI_FAMILY==WINAPI_FAMILY_APP) || (WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)))
 /** Enable the Stack trace tracking only for Win32|Debug platform (NOT WinPhone or WinStore)*/
 #define TRACK_STACK_TRACE
 #endif
 
+#include <atomic>
+#include <thread>
+#include <mutex>
 
 #if defined(_WIN32)
 /// Is for Win32 and all windows platforms (including WinPhone & WinStore)
@@ -36,87 +40,90 @@ void operator delete[](void* p, const char* file, int line) throw();
 
 namespace mlt
 {
-	/** Prints all heap and reference leaks to stderr. */
-	extern void PrintMemoryLeaks();
+    typedef void*(*AllocFuncPtr)(unsigned int, const char*, int);
+    typedef void(*FreeFuncPtr)(void*);
 
-	#if defined(TRACK_STACK_TRACE)
-	/** Sets whether stack traces are tracked on memory allocations or not.
-	* @param trackStackTrace Whether to track the stack trace on memory allocations.*/
-	void SetTrackStackTrace(bool trackStackTrace);
+    extern AllocFuncPtr s_allocFuncPtr;
+    extern FreeFuncPtr  s_FreeFuncPtr;
 
-	/** Toggles stack trace tracking on memory allocations.*/
-	void ToggleTrackStackTrace();
-	#endif //TRACK_STACK_TRACE
+    static void* AllocInit(unsigned int size, const char* file, int line);
+    static void* AllocInit2(unsigned int size, const char* file, int line);
+    static void* AllocNormal(unsigned int size, const char* file, int line);
+    static void* AllocShutdown(unsigned int size, const char* file, int line);
+    static void FreeNormal(void* mem);
+    static void FreeShutdown(void* mem);
 
+    struct MemoryAllocationRecord;
+    class LeakTracker
+    {
+        MemoryAllocationRecord* m_memoryAllocations;
+        int m_memoryAllocationCount;
+        std::mutex m_m;
+        std::atomic<unsigned int> m_maxSize;
+        std::atomic<unsigned int> m_maxLine;
+      
+    public:
+        LeakTracker();
+        ~LeakTracker();
+        void* DebugAlloc(std::size_t size, const char* file, int line);
+        void DebugFree(void* p);
 
-	class LeakTracker
-	{
-	public:
+        /** Prints all heap and reference leaks to stderr. */
+        void PrintMemoryLeaks();
 
-		void* operator new(size_t size);
-		void operator delete(void* p);
+        #if defined(TRACK_STACK_TRACE)
+        void PrintStackTrace(MemoryAllocationRecord* rec);
 
-		void* operator new[](size_t size);
-		void operator delete[](void* p);
+        /** Sets whether stack traces are tracked on memory allocations or not.
+        * @param trackStackTrace Whether to track the stack trace on memory allocations.*/
+        void SetTrackStackTrace(bool trackStackTrace);
 
+        /** Toggles stack trace tracking on memory allocations.*/
+        void ToggleTrackStackTrace();
+        #endif //TRACK_STACK_TRACE
 
-		void* operator new(size_t size, const char *file, int line);
-		void operator delete(void* p, const char *file, int line);
+    };
 
-		void* operator new[](size_t size, const char *file, int line);
-		void operator delete[](void* p, const char *file, int line);
+	
 
-	protected:
+	//class ILeakTracker
+	//{
+	//public:
 
-		/** The constructor. */
-		LeakTracker(){}
+	//	void* operator new(size_t size);
+	//	void operator delete(void* p);
 
-		/** The destructor. */
-		virtual ~LeakTracker(){}
-	};
-
-
-    /**
-    * CustomAlloc - alloc memory.
-    *
-    * @param size is a std::size_t representing the amount of memory to be allocated .
-    * @param filename is pointer to char (optional), representing the name of file.
-    * @param line is an integer (optional).
-    * @return  a void pointer to the allocated memory.*/
-	void* CustomAlloc( std::size_t size, const char* filename = 0, int line = 0 );
-
-
-    /**
-    * CustomAllocAlign - alloc memory with given alignment.
-    *
-    * @param size is a std::size_t representing the amount of memory to be allocated.
-    * @param align is a std::size_t representing the alignment.
-    * @param filename is pointer to char (optional).
-    * @param line is an integer (optional).
-    * @return a void pointer to the allocated memory.*/
-	void* CustomAllocAlign( std::size_t size, std::size_t align, const char* filename = 0, int line = 0 );
+	//	void* operator new[](size_t size);
+	//	void operator delete[](void* p);
 
 
-    /**
-    * CustomFree - free the memory.
-    *
-    * @param ptr is a void pointer that is the memory to be free.*/
-	void  CustomFree( void* ptr );
+	//	void* operator new(size_t size, const char *file, int line);
+	//	void operator delete(void* p, const char *file, int line);
+
+	//	void* operator new[](size_t size, const char *file, int line);
+	//	void operator delete[](void* p, const char *file, int line);
+
+	//protected:
+
+	//	/** The constructor. */
+ //       ILeakTracker(){}
+
+	//	/** The destructor. */
+ //       virtual ~ILeakTracker(){}
+	//};
 
 } //namespace mlt
 
 
 #if defined(_WIN32)
     #define	NEW new(__FILE__, __LINE__)
-    #define PRINT_MEMORY_LEAKS_AT_EXIT	atexit(mlt::PrintMemoryLeaks)
 #else
     #define NEW	new
-    #define PRINT_MEMORY_LEAKS_AT_EXIT
 #endif//_WIN32
 
 
 
-#else //!_DEBUG
+#else //!MY_DEBUG
 
 #include <iostream>
 
@@ -125,29 +132,13 @@ namespace mlt
 	class LeakTracker
 	{
 	};
-
-    void* CustomAlloc(std::size_t size, const char* filename = 0, int line = 0)
-    {
-        return malloc(size);
-    }
-
-    void* CustomAllocAlign(std::size_t size, std::size_t align, const char* filename = 0, int line = 0)
-    {
-        return malloc(size);
-    }
-
-    void CustomFree(void* ptr)
-    {
-        free(ptr);
-    }
-
+    sdfsdfasdf
     void PrintMemoryLeaks(){}
 }
 
 //just declare the NEW
 #define NEW	new  
-#define PRINT_MEMORY_LEAKS_AT_EXIT
 
-#endif //_DEBUG
+#endif //MY_DEBUG
 
 #endif //__MEMORYLT_H_INCLUDED__
