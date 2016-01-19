@@ -8,7 +8,7 @@
 
 int a = 0;
 
-class A
+class A : public mlt::ILeakTracker
 {
 public:
     A() :m_a(0), m_b(0)
@@ -37,7 +37,7 @@ int main(int argc, const char* argv[])
     delete test;
 
     std::vector<std::thread> threads;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50; i++)
     {
         threads.push_back(std::thread(testFn1));
     }

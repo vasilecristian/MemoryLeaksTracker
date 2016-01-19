@@ -1,7 +1,7 @@
 
 #include "MemoryLeaksTracker/MemoryLT.h"
-#define MY_DEBUG
-#if defined(MY_DEBUG)
+
+#if defined(_DEBUG)
 
 /// Override (only for this file) the _HAS_EXCEPTIONS values. Otherwise a compile error is 
 /// generated (aka: error C3861: '__uncaught_exception': identifier not found)
@@ -11,14 +11,11 @@
 #define _HAS_EXCEPTIONS 2
 
 
-#include <new>
-#include <exception>
 #include <cstdio>
 #include <cstdarg>
 #include <thread>
-#include <mutex>
 #include <iostream>
-#include <atomic>
+#include <array>
 
 
 #if defined(TRACK_STACK_TRACE)
@@ -27,26 +24,24 @@
     #pragma comment(lib,"dbghelp.lib")
 
     #define MAX_STACK_FRAMES 16
-    bool __trackStackTrace = false;
 #endif //TRACK_STACK_TRACE
 
 namespace mlt
 {
-
-   
-
     ///----
     AllocFuncPtr s_allocFuncPtr = AllocInit;
     FreeFuncPtr  s_FreeFuncPtr = FreeNormal;
 
-    // we reserve some memory to hold the mem globals
+    /** We reserve some memory to hold the mem for s_leakTracker */
     static char s_memleakTracker[sizeof(LeakTracker)] = { 0 };
+
+    /** Is the static pointer for leakTracker*/
     static LeakTracker* s_leakTracker = nullptr;
 
 
-    // implement our first allocation function that constructs 
-    // our heap on first use.
-    static void* AllocInit(unsigned int size, const char* file, int line)
+    /** Implement our first allocation function that constructs 
+    * our heap on first use.*/
+    static void* AllocInit(unsigned int size, const char* file, unsigned int line)
     {
         s_allocFuncPtr = AllocInit2;
         s_leakTracker = new(s_memleakTracker, NULL) LeakTracker;
@@ -55,21 +50,21 @@ namespace mlt
         return AllocNormal(size, file, line);
     }
 
-    // This gets called during the initialization of memGlobals only.
-    static void* AllocInit2(unsigned int size, const char* file, int line)
+    /** This gets called during the initialization of s_leakTracker only */
+    static void* AllocInit2(unsigned int size, const char* file, unsigned int line)
     {
         return malloc(size);
     }
 
-    // The normal allocator that runs after heap construction, and before
-    // its eventual destruction.
-    static void* AllocNormal(unsigned int size, const char* file, int line)
+    /** The normal allocator that runs after heap construction, and before
+    * its eventual destruction. */
+    static void* AllocNormal(unsigned int size, const char* file, unsigned int line)
     {
-        return s_leakTracker->DebugAlloc(size, file, line);
+        return s_leakTracker->Alloc(size, file, line);
     }
 
-    // Allocates memory during shutdown of the memory manager
-    static void* AllocShutdown(unsigned int size, const char* file, int line)
+    /** Allocates memory during shutdown of the memory manager*/
+    static void* AllocShutdown(unsigned int size, const char* file, unsigned int line)
     {
         return malloc(size);
     }
@@ -79,6 +74,7 @@ namespace mlt
         s_leakTracker->PrintMemoryLeaks();
 
         s_leakTracker->~LeakTracker();
+
         // leakCheckReport();
     }
 
@@ -89,28 +85,45 @@ namespace mlt
 
     static void FreeNormal(void* mem)
     {
-        s_leakTracker->DebugFree(mem);
+        s_leakTracker->Free(mem);
     }
     ///----
 
 
     struct MemoryAllocationRecord
     {
-        unsigned long m_address;          // address returned to the caller after allocation
-        unsigned int m_size;              // size of the allocation request
-        const char* m_file;               // source file of allocation request
-        int m_line;                       // source line of the allocation request
+        /**address returned to the caller after allocation*/
+        unsigned long m_address;         
+
+        /**size of the allocation request*/
+        unsigned int m_size;              
+
+        /**source file of allocation request*/
+        const char* m_file;               
+
+        /**source line of the allocation request*/
+        unsigned int m_line;                       
+
+        /**linked list next node*/
         MemoryAllocationRecord* m_next;
+        /**linked list prev node*/
         MemoryAllocationRecord* m_prev;
-#if defined(TRACK_STACK_TRACE)
+
+        #if defined(TRACK_STACK_TRACE)
         bool m_trackStackTrace;
-        unsigned int m_pc[MAX_STACK_FRAMES];
-#endif
+        std::array<unsigned int, MAX_STACK_FRAMES> m_pc;
+        #endif
     };
 
-    LeakTracker::LeakTracker() :m_memoryAllocations(0), m_memoryAllocationCount(0), m_maxSize(0), m_maxLine(0)
+
+    std::atomic<bool> LeakTracker::s_trackStackTrace = true;
+
+    LeakTracker::LeakTracker() 
+        : m_memoryAllocations(0)
+        , m_memoryAllocationCount(0)
+        , m_maxSize(0)
+        , m_maxLine(0)
     {
-        //std::cout << "LeakTracker::LeakTracker" << std::endl;
         atexit(LeakTrackerExit);
 
         // construct your heap here
@@ -118,8 +131,6 @@ namespace mlt
 
     LeakTracker::~LeakTracker()
     {
-        //std::cout << "LeakTracker::~LeakTracker" << std::endl;
-
         s_allocFuncPtr = AllocShutdown;
 
         // destruct your heap here
@@ -127,19 +138,18 @@ namespace mlt
         s_FreeFuncPtr = FreeShutdown;
     }
 
-    void* LeakTracker::DebugAlloc(std::size_t size, const char* file, int line)
+    void* LeakTracker::Alloc(std::size_t size, const char* file, unsigned int line)
     {
-        // Allocate memory + size for a MemoryAlloctionRecord
+        /// Allocate memory + size for a MemoryAlloctionRecord
         unsigned char* mem = (unsigned char*)malloc(size + sizeof(MemoryAllocationRecord));
 
+        /// Cast
         MemoryAllocationRecord* rec = (MemoryAllocationRecord*)mem;
 
-        // Move memory pointer past record
+        /// Move memory pointer past record
         mem += sizeof(MemoryAllocationRecord);
 
-        s_allocFuncPtr = AllocInit2;
         m_m.lock();
-        s_allocFuncPtr = AllocNormal;
         rec->m_address = (unsigned long)mem;
         rec->m_size = (unsigned int)size;
         rec->m_file = file;
@@ -153,10 +163,10 @@ namespace mlt
             m_maxLine = line;
 
 
-        // Capture the stack frame (up to MAX_STACK_FRAMES) if we 
-        // are running on Windows and the user has enabled it.
-#if defined(TRACK_STACK_TRACE)
-        rec->m_trackStackTrace = __trackStackTrace;
+        #if defined(TRACK_STACK_TRACE)
+        /// Capture the stack frame (up to MAX_STACK_FRAMES) if we 
+        /// are running on Windows and the user has enabled it.
+        rec->m_trackStackTrace = s_trackStackTrace;
         if (rec->m_trackStackTrace)
         {
             static bool initialized = false;
@@ -167,15 +177,15 @@ namespace mlt
                 initialized = true;
             }
 
-            // Get the current context (state of EBP, EIP, ESP registers).
+            /// Get the current context (state of EBP, EIP, ESP registers).
             static CONTEXT context;
             RtlCaptureContext(&context);
 
             static STACKFRAME64 stackFrame;
             memset(&stackFrame, 0, sizeof(STACKFRAME64));
 
-            // Initialize the stack frame based on the machine architecture.
-#if defined(_M_IX86)
+            /// Initialize the stack frame based on the machine architecture.
+            #if defined(_M_IX86)
             static const DWORD machineType = IMAGE_FILE_MACHINE_I386;
             stackFrame.AddrPC.Offset = context.Eip;
             stackFrame.AddrPC.Mode = AddrModeFlat;
@@ -183,7 +193,7 @@ namespace mlt
             stackFrame.AddrFrame.Mode = AddrModeFlat;
             stackFrame.AddrStack.Offset = context.Esp;
             stackFrame.AddrStack.Mode = AddrModeFlat;
-#elif defined (_M_X64)
+            #elif defined (_M_X64)
             static const DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
             stackFrame.AddrPC.Offset = context.Rip;
             stackFrame.AddrPC.Mode = AddrModeFlat;
@@ -191,23 +201,22 @@ namespace mlt
             stackFrame.AddrFrame.Mode = AddrModeFlat;
             stackFrame.AddrStack.Offset = context.Rsp;
             stackFrame.AddrStack.Mode = AddrModeFlat;
-#else
-#error "Machine architecture not supported!"
-#endif
+            #else
+            #error "Machine architecture not supported!"
+            #endif
 
-            // Walk up the stack and store the program counters.
-            memset(rec->m_pc, 0, sizeof(rec->m_pc));
-            for (int i = 0; i < MAX_STACK_FRAMES; i++)
+            /// Walk up the stack and store the program counters.
+            for (auto& pc : rec->m_pc)
             {
-                rec->m_pc[i] = (unsigned int)stackFrame.AddrPC.Offset;
+                pc = (unsigned int)stackFrame.AddrPC.Offset;
                 if (!StackWalk64(machineType, GetCurrentProcess(), GetCurrentThread(), &stackFrame,
-                    &context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL))
+                                 &context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL))
                 {
                     break;
                 }
             }
         }
-#endif //TRACK_STACK_TRACE
+        #endif //TRACK_STACK_TRACE
 
         if (m_memoryAllocations)
             m_memoryAllocations->m_prev = rec;
@@ -218,37 +227,42 @@ namespace mlt
         return mem;
     }
 
-    void LeakTracker::DebugFree(void* p)
+    void LeakTracker::Free(void* p)
     {
         if (p == 0)
             return;
 
-        // Backup passed in pointer to access memory allocation record
+        /// Backup passed in pointer to access memory allocation record
         void* mem = ((unsigned char*)p) - sizeof(MemoryAllocationRecord);
 
         MemoryAllocationRecord* rec = (MemoryAllocationRecord*)mem;
 
-        // Sanity check: ensure that address in record matches passed in address
+        /// Sanity check: ensure that address in record matches passed in address
         if (rec->m_address != (unsigned long)p)
         {
-            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record.\n");
-            return;
-        }
-        if (rec->m_size > m_maxSize)
-        {
-            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record.\n");
-            return;
-        }
-        if (rec->m_line > m_maxLine)
-        {
-            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record.\n");
+            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong address).\n");
+            std::cout << "A";
             return;
         }
 
-        // Link this item out
-        s_allocFuncPtr = AllocInit2;
+        /// Sanity check: ensure that size is smaller than maximum (tracked)
+        if (rec->m_size > m_maxSize)
+        {
+            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong size).\n");
+            std::cout << "S";
+            return;
+        }
+
+        /// Sanity check: ensure that line is smaller than maximum (tracked)
+        if (rec->m_line > m_maxLine)
+        {
+            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong line).\n");
+            std::cout << "L";
+            return;
+        }
+
+        /// Link this item out
         m_m.lock();
-        s_allocFuncPtr = AllocNormal;
         if (m_memoryAllocations == rec)
             m_memoryAllocations = rec->m_next;
         if (rec->m_prev)
@@ -258,25 +272,66 @@ namespace mlt
         --m_memoryAllocationCount;
         m_m.unlock();
 
-        // Free the address from the original alloc location (before mem allocation record)
+        /// Free the address from the original alloc location (before mem allocation record)
         free(mem);
     }
 
-#if defined(TRACK_STACK_TRACE)
+    void LeakTracker::PrintMemoryLeaks()
+    {
+        printf("\n");
+
+        /// Dump general heap memory leaks
+        if (m_memoryAllocationCount == 0)
+        {
+            printf("[memory] All HEAP allocations successfully cleaned up (no leaks detected).\n");
+        }
+        else
+        {
+            printf("[memory] WARNING: %d  HEAP allocations still active in memory.\n", m_memoryAllocationCount);
+
+            MemoryAllocationRecord* rec = m_memoryAllocations;
+            while (rec)
+            {
+                #if defined(TRACK_STACK_TRACE)
+                if (rec->m_trackStackTrace)
+                {
+                    printf("[memory] LEAK: At address %d, size %d:\n", rec->m_address, rec->m_size);
+                    LeakTracker::PrintStackTrace(rec);
+                }
+                else
+                {
+                    if (strlen(rec->m_file) > 0)
+                    {
+                        printf("[memory] LEAK: At address %d, size %d, %s:%d.\n", rec->m_address, rec->m_size, rec->m_file, rec->m_line);
+                    }
+                }
+                #else //!TRACK_STACK_TRACE
+                if (strlen(rec->m_file) > 0)
+                {
+                    printf("[memory] LEAK: At address %d, size %d, %s:%d.\n", rec->m_address, rec->m_size, rec->m_file, rec->m_line);
+                }
+                #endif //TRACK_STACK_TRACE
+                rec = rec->m_next;
+            }
+        }
+    }
+
+
+    #if defined(TRACK_STACK_TRACE)
     void LeakTracker::PrintStackTrace(MemoryAllocationRecord* rec)
     {
         const unsigned int bufferSize = 512;
 
-        // Resolve the program counter to the corresponding function names.
+        /// Resolve the program counter to the corresponding function names.
         unsigned int pc;
         for (int i = 0; i < MAX_STACK_FRAMES; i++)
         {
-            // Check to see if we are at the end of the stack trace.
+            /// Check to see if we are at the end of the stack trace.
             pc = rec->m_pc[i];
             if (pc == 0)
                 break;
 
-            // Get the function name.
+            /// Get the function name.
             unsigned char buffer[sizeof(IMAGEHLP_SYMBOL64) + bufferSize];
             IMAGEHLP_SYMBOL64* symbol = (IMAGEHLP_SYMBOL64*)buffer;
             DWORD64 displacement;
@@ -291,14 +346,14 @@ namespace mlt
             {
                 symbol->Name[bufferSize - 1] = '\0';
 
-                // Check if we need to go further up the stack.
+                /// Check if we need to go further up the stack.
                 if (strncmp(symbol->Name, "operator new", 12) == 0)
                 {
-                    // In operator new or new[], keep going...
+                    /// In operator new or new[], keep going...
                 }
                 else
                 {
-                    // Get the file and line number.
+                    /// Get the file and line number.
                     if (pc != 0)
                     {
                         IMAGEHLP_LINE64 line;
@@ -324,64 +379,15 @@ namespace mlt
             }
         }
     }
-#endif //TRACK_STACK_TRACE
 
-    void LeakTracker::PrintMemoryLeaks()
-    {
-        // Dump general heap memory leaks
-        if (m_memoryAllocationCount == 0)
-        {
-            printf("[memory] All HEAP allocations successfully cleaned up (no leaks detected).\n");
-        }
-        else
-        {
-            printf("[memory] WARNING: %d  HEAP allocations still active in memory.\n", m_memoryAllocationCount);
-
-            MemoryAllocationRecord* rec = m_memoryAllocations;
-            while (rec)
-            {
-#if defined(TRACK_STACK_TRACE)
-                if (rec->m_trackStackTrace)
-                {
-                    printf("[memory] LEAK: At address %d, size %d:\n", rec->m_address, rec->m_size);
-                    LeakTracker::PrintStackTrace(rec);
-                }
-                else
-                {
-                    if (strlen(rec->m_file) > 0)
-                    {
-                        printf("[memory] LEAK: At address %d, size %d, %s:%d.\n", rec->m_address, rec->m_size, rec->m_file, rec->m_line);
-                    }
-                }
-#else
-                if (strlen(rec->m_file) > 0)
-                {
-                    printf("[memory] LEAK: At address %d, size %d, %s:%d.\n", rec->m_address, rec->m_size, rec->m_file, rec->m_line);
-                }
-#endif
-                rec = rec->m_next;
-            }
-        }
-    }
-
-#if defined(TRACK_STACK_TRACE)
     void LeakTracker::SetTrackStackTrace(bool trackStackTrace)
     {
-        __trackStackTrace = trackStackTrace;
+        s_trackStackTrace = trackStackTrace;
     }
-
-    void LeakTracker::ToggleTrackStackTrace()
-    {
-        __trackStackTrace = !__trackStackTrace;
-    }
-#endif
-
-
+    #endif //TRACK_STACK_TRACE
 }
 
 
-#if defined(_WIN32)
-/// Is for Win32 and all windows platforms (including WinPhone & WinStore)
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )
@@ -441,49 +447,48 @@ void operator delete[](void* p, const char* file, int line) throw()
 #pragma warning( default : 4290 )
 #endif
 
-#endif //WIN32
 
 namespace mlt
 {
-    /*void* ILeakTracker::operator new(size_t size)
+    void* ILeakTracker::operator new(size_t size)
 	{
-		return mlt::DebugAlloc(size, "", 0);
+        return mlt::s_allocFuncPtr(size, "", 0);
 	}
 
     void ILeakTracker::operator delete(void* p)
 	{
-		mlt::DebugFree(p);
-	}
+        mlt::s_FreeFuncPtr(p);
+    }
 
     void* ILeakTracker::operator new[](size_t size)
 	{
-		return mlt::DebugAlloc(size, "", 0);
-	}
+        return mlt::s_allocFuncPtr(size, "", 0);
+    }
 
-        void ILeakTracker::operator delete[](void* p)
+    void ILeakTracker::operator delete[](void* p)
 	{
-		mlt::DebugFree(p);
+        mlt::s_FreeFuncPtr(p);
 	};
 
     void* ILeakTracker::operator new(size_t size, const char *file, int line)
 	{
-		return mlt::DebugAlloc(size, "", 0);
+        return mlt::s_allocFuncPtr(size, file, line);
 	};
 
     void ILeakTracker::operator delete(void* p, const char *file, int line)
 	{
-        mlt::DebugFree(p);
+        mlt::s_FreeFuncPtr(p);
 	};
 
     void* ILeakTracker::operator new[](size_t size, const char *file, int line)
 	{
-        return mlt::DebugAlloc(size, "", 0);;
+        return mlt::s_allocFuncPtr(size, file, line);
 	}
 
     void ILeakTracker::operator delete[](void* p, const char *file, int line)
 	{
-        mlt::DebugFree(p);
-	};*/
+        mlt::s_FreeFuncPtr(p);
+	};
 }
 
-#endif //MY_DEBUG
+#endif //_DEBUG
