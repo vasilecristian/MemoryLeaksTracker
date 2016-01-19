@@ -116,7 +116,7 @@ namespace mlt
     };
 
 
-    std::atomic<bool> LeakTracker::s_trackStackTrace = true;
+    std::atomic<bool> LeakTracker::s_trackStackTrace = false;
 
     LeakTracker::LeakTracker() 
         : m_memoryAllocations(0)
@@ -241,7 +241,7 @@ namespace mlt
         if (rec->m_address != (unsigned long)p)
         {
             //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong address).\n");
-            std::cout << "A";
+            //std::cout << "A";
             return;
         }
 
@@ -249,7 +249,7 @@ namespace mlt
         if (rec->m_size > m_maxSize)
         {
             //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong size).\n");
-            std::cout << "S";
+            //std::cout << "S";
             return;
         }
 
@@ -257,7 +257,7 @@ namespace mlt
         if (rec->m_line > m_maxLine)
         {
             //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong line).\n");
-            std::cout << "L";
+            //std::cout << "L";
             return;
         }
 
