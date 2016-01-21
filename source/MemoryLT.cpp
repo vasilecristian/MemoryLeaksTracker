@@ -300,7 +300,7 @@ namespace mlt
                 }
                 else
                 {
-                    if (strlen(rec->m_file) > 0)
+					if (rec->m_file && strlen(rec->m_file) > 0)
                     {
                         printf("[memory] LEAK: At address %d, size %d, %s:%d.\n", rec->m_address, rec->m_size, rec->m_file, rec->m_line);
                     }
