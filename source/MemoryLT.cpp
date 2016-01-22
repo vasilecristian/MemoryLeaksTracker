@@ -493,5 +493,15 @@ namespace mlt
         mlt::s_FreeFuncPtr(p);
 	};
 }
+#else //!_DEBUG
+
+void mlt::LeakTracker::SetTrackStackTrace(bool trackStackTrace)
+{
+
+}
+void mlt::LeakTracker::PrintMemoryLeaks()
+{
+
+}
 
 #endif //_DEBUG

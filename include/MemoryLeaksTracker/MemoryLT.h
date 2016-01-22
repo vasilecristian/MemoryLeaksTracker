@@ -119,6 +119,10 @@ namespace mlt
 
 namespace mlt
 {
+    class ILeakTracker
+    {
+    };
+
     class LeakTracker
     {
     public:

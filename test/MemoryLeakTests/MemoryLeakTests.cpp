@@ -47,6 +47,7 @@ int main(int argc, const char* argv[])
         thread.join();
     }
 
+    mlt::LeakTracker::PrintMemoryLeaks();
 	return 0;
 }
 
