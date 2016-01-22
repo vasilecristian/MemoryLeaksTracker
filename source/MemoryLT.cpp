@@ -288,7 +288,7 @@ namespace mlt
         }
         else
         {
-            printf("[memory] WARNING: %d  HEAP allocations still active in memory.\n", m_memoryAllocationCount);
+            printf("[memory] WARNING: %d  HEAP allocations still active in memory.\n", s_leakTracker->m_memoryAllocationCount);
 
 			MemoryAllocationRecord* rec = s_leakTracker->m_memoryAllocations;
             while (rec)
