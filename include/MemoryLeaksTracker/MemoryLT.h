@@ -62,7 +62,7 @@ namespace mlt
         void Free(void* p);
 
         /** Prints all heap and reference leaks to stderr. */
-        void PrintMemoryLeaks();
+        static void PrintMemoryLeaks();
 
         #if defined(TRACK_STACK_TRACE)
         /** Sets whether stack traces are tracked on memory allocations or not.
@@ -123,6 +123,7 @@ namespace mlt
     {
     public:
         static void SetTrackStackTrace(bool trackStackTrace);
+		static void PrintMemoryLeaks();
     };
 }
 

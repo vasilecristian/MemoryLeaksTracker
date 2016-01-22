@@ -44,7 +44,7 @@ namespace mlt
     static void* AllocInit(unsigned int size, const char* file, unsigned int line)
     {
         s_allocFuncPtr = AllocInit2;
-        s_leakTracker = new(s_memleakTracker, NULL) LeakTracker;
+        s_leakTracker = new(s_memleakTracker) LeakTracker;
         s_allocFuncPtr = AllocNormal;
 
         return AllocNormal(size, file, line);
@@ -116,7 +116,7 @@ namespace mlt
     };
 
 
-    std::atomic<bool> LeakTracker::s_trackStackTrace = false;
+	std::atomic<bool> LeakTracker::s_trackStackTrace = { false };
 
     LeakTracker::LeakTracker() 
         : m_memoryAllocations(0)
@@ -280,8 +280,9 @@ namespace mlt
     {
         printf("\n");
 
+		s_leakTracker->m_m.lock();
         /// Dump general heap memory leaks
-        if (m_memoryAllocationCount == 0)
+		if (s_leakTracker->m_memoryAllocationCount == 0)
         {
             printf("[memory] All HEAP allocations successfully cleaned up (no leaks detected).\n");
         }
@@ -289,14 +290,14 @@ namespace mlt
         {
             printf("[memory] WARNING: %d  HEAP allocations still active in memory.\n", m_memoryAllocationCount);
 
-            MemoryAllocationRecord* rec = m_memoryAllocations;
+			MemoryAllocationRecord* rec = s_leakTracker->m_memoryAllocations;
             while (rec)
             {
                 #if defined(TRACK_STACK_TRACE)
                 if (rec->m_trackStackTrace)
                 {
                     printf("[memory] LEAK: At address %d, size %d:\n", rec->m_address, rec->m_size);
-                    LeakTracker::PrintStackTrace(rec);
+					s_leakTracker->PrintStackTrace(rec);
                 }
                 else
                 {
@@ -314,6 +315,8 @@ namespace mlt
                 rec = rec->m_next;
             }
         }
+
+		s_leakTracker->m_m.unlock();
     }
 
 
@@ -430,17 +433,17 @@ void operator delete (void* p) throw()
 
 void operator delete[](void* p) throw()
 {
-    delete p;
+    mlt::s_FreeFuncPtr(p);
 }
 
 void operator delete (void* p, const char* file, int line) throw()
 {
-    delete p;
+    mlt::s_FreeFuncPtr(p);
 }
 
 void operator delete[](void* p, const char* file, int line) throw()
 {
-    delete p;
+    mlt::s_FreeFuncPtr(p);
 }
 
 #ifdef _MSC_VER
