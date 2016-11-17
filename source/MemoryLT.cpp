@@ -10,6 +10,9 @@
 #endif //_HAS_EXCEPTIONS
 #define _HAS_EXCEPTIONS 2
 
+#if defined new
+#undef new
+#endif
 
 #include <cstdio>
 #include <cstdarg>
@@ -71,10 +74,14 @@ namespace mlt
 
     static void LeakTrackerExit()
     {
-        s_leakTracker->PrintMemoryLeaks();
+		if (s_leakTracker)
+		{
+			s_leakTracker->PrintMemoryLeaks();
 
-        s_leakTracker->~LeakTracker();
+			s_leakTracker->~LeakTracker();
 
+			s_leakTracker = nullptr;
+		}
         // leakCheckReport();
     }
 

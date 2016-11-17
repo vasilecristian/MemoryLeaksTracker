@@ -8,17 +8,22 @@
     <PrecompiledHeader>NotUsing</PrecompiledHeader>
     <WarningLevel>Level3</WarningLevel>
     <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
-    <PreprocessorDefinitions>_DEBUG;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_WIN32_WINNT=0x0601;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    <PreprocessorDefinitions>_DEBUG;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;OS_WP8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <AdditionalIncludeDirectories>..\..\include;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDataBaseFileName>$(OutDir)MemoryLeaksTracker_x64_d.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)MemoryLeaksTracker_x86_d.pdb</ProgramDataBaseFileName>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>/wd4530 /we4715 /we4716 /we4150 /Zc:inline /Zm400 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4530 /we4715 /we4716 /we4150 /Zm400 %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <CompileAsWinRT>true</CompileAsWinRT>
+      <DisableSpecificWarnings>4005;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalUsingDirectories>$(WindowsSDK_MetadataPath);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

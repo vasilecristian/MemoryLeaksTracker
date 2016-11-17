@@ -1,0 +1,451 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E2CD3D4FB076CD39175D5B8F /* MemoryLT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B4A2D1AD50BC0C47715235A /* MemoryLT.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0B4A2D1AD50BC0C47715235A /* MemoryLT.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MemoryLT.cpp; path = ../../../source/MemoryLT.cpp; sourceTree = "<group>"; };
+		5F420F587A8C888261517598 /* MemoryLeaksTracker */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = MemoryLeaksTracker; path = libMemoryLeaksTracker_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9C7715BC6FF1905CF36E79B /* MemoryLT.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MemoryLT.h; path = ../../../include/MemoryLeaksTracker/MemoryLT.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		63179BC86C500FF272EDE208 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		21D83EC8EF81CEB256685D08 /* source */ = {
+			isa = PBXGroup;
+			children = (
+				0B4A2D1AD50BC0C47715235A /* MemoryLT.cpp */,
+			);
+			name = source;
+			sourceTree = "<group>";
+		};
+		5DC24A4372E1022DA93B6883 /* MemoryLeaksTracker */ = {
+			isa = PBXGroup;
+			children = (
+				F9C7715BC6FF1905CF36E79B /* MemoryLT.h */,
+			);
+			name = MemoryLeaksTracker;
+			sourceTree = "<group>";
+		};
+		9A8B579378D889FD339C05D3 /* MemoryLeaksTracker */ = {
+			isa = PBXGroup;
+			children = (
+				E717768EC564A8F8802824CE /* include */,
+				21D83EC8EF81CEB256685D08 /* source */,
+				EA8E290FE2272BF9B2E0274F /* Products */,
+			);
+			name = MemoryLeaksTracker;
+			sourceTree = "<group>";
+		};
+		E717768EC564A8F8802824CE /* include */ = {
+			isa = PBXGroup;
+			children = (
+				5DC24A4372E1022DA93B6883 /* MemoryLeaksTracker */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		EA8E290FE2272BF9B2E0274F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5F420F587A8C888261517598 /* MemoryLeaksTracker */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F0D2FF3E4EBDFB281F6E9D7E /* MemoryLeaksTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F39F78748726BB14F103DC7 /* Build configuration list for PBXNativeTarget "MemoryLeaksTracker" */;
+			buildPhases = (
+				E4E88068EE20F492F4BEC6A8 /* Resources */,
+				7E9E081F87D67C498E744E5F /* Sources */,
+				63179BC86C500FF272EDE208 /* Frameworks */,
+				3BE7F37399D2EF5D6A8391B3 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MemoryLeaksTracker;
+			productName = MemoryLeaksTracker;
+			productReference = 5F420F587A8C888261517598 /* MemoryLeaksTracker */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				TargetAttributes = {
+					F0D2FF3E4EBDFB281F6E9D7E = {
+					};
+				};
+			};
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "MemoryLeaksTracker" */;
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 1;
+			mainGroup = 9A8B579378D889FD339C05D3 /* MemoryLeaksTracker */;
+			productRefGroup = 5D487F914FF3F53BC57CB5D1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F0D2FF3E4EBDFB281F6E9D7E /* MemoryLeaksTracker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E4E88068EE20F492F4BEC6A8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7E9E081F87D67C498E744E5F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2CD3D4FB076CD39175D5B8F /* MemoryLT.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		261BB0DE5F41D788849C871E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Valeri Vuchov (WDTMDP2J2J)";
+				COMMON_HEADER_SEARCH_PATHS = (
+					../../../include,
+					../../../source,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					_DEBUG,
+					_SCL_SECURE_NO_WARNINGS,
+					_CRT_SECURE_NO_WARNINGS,
+					_WINSOCK_DEPRECATED_NO_WARNINGS,
+					OS_IPHONE,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "$(COMMON_HEADER_SEARCH_PATHS)";
+				INSTALL_PATH = /usr/local/lib;
+				OBJROOT = obj/Debug;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-fembed-bitcode",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-x",
+					"objective-c++",
+					"-Wno-error",
+				);
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
+				SYMROOT = ../../../lib/xcode4/tvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
+			};
+			name = Debug;
+		};
+		638D6F13BF44327D8A76BD53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Valeri Vuchov (WDTMDP2J2J)";
+				COMMON_HEADER_SEARCH_PATHS = (
+					../../../include,
+					../../../source,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					_DEBUG,
+					_SCL_SECURE_NO_WARNINGS,
+					_CRT_SECURE_NO_WARNINGS,
+					_WINSOCK_DEPRECATED_NO_WARNINGS,
+					OS_IPHONE,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "$(COMMON_HEADER_SEARCH_PATHS)";
+				INSTALL_PATH = /usr/local/lib;
+				OBJROOT = obj/Debug;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-fembed-bitcode",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-x",
+					"objective-c++",
+					"-Wno-error",
+				);
+				PRODUCT_NAME = MemoryLeaksTracker_d;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
+				SYMROOT = ../../../lib/xcode4/tvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
+			};
+			name = Debug;
+		};
+		8A2EF058A57969828C3E5698 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Valeri Vuchov (WDTMDP2J2J)";
+				COMMON_HEADER_SEARCH_PATHS = (
+					../../../include,
+					../../../source,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NDEBUG,
+					"_SECURE_SCL=0",
+					"_SECURE_SCL_THROWS=0",
+					_SCL_SECURE_NO_WARNINGS,
+					_CRT_SECURE_NO_WARNINGS,
+					_WINSOCK_DEPRECATED_NO_WARNINGS,
+					OS_IPHONE,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "$(COMMON_HEADER_SEARCH_PATHS)";
+				INSTALL_PATH = /usr/local/lib;
+				OBJROOT = obj/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-fembed-bitcode",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-x",
+					"objective-c++",
+					"-Wno-error",
+				);
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
+				SYMROOT = ../../../lib/xcode4/tvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
+			};
+			name = Release;
+		};
+		DF03414D0378873765791F8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Valeri Vuchov (WDTMDP2J2J)";
+				COMMON_HEADER_SEARCH_PATHS = (
+					../../../include,
+					../../../source,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NDEBUG,
+					"_SECURE_SCL=0",
+					"_SECURE_SCL_THROWS=0",
+					_SCL_SECURE_NO_WARNINGS,
+					_CRT_SECURE_NO_WARNINGS,
+					_WINSOCK_DEPRECATED_NO_WARNINGS,
+					OS_IPHONE,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "$(COMMON_HEADER_SEARCH_PATHS)";
+				INSTALL_PATH = /usr/local/lib;
+				OBJROOT = obj/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-fembed-bitcode",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-x",
+					"objective-c++",
+					"-Wno-error",
+				);
+				PRODUCT_NAME = MemoryLeaksTracker;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
+				SYMROOT = ../../../lib/xcode4/tvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "MemoryLeaksTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				261BB0DE5F41D788849C871E /* Debug */,
+				8A2EF058A57969828C3E5698 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3F39F78748726BB14F103DC7 /* Build configuration list for PBXNativeTarget "MemoryLeaksTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				638D6F13BF44327D8A76BD53 /* Debug */,
+				DF03414D0378873765791F8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

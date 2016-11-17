@@ -69,8 +69,6 @@ project "MemoryLeaksTracker"
         defines {"OS_IPHONE"}
 		buildoptions { "-std=c++11 -stdlib=libc++ -x objective-c++ -Wno-error" }
 		
-		-- kind "WindowedApp"
-		-- files { GetPathFromPlatform() .. "/Info.plist" }
     end
 
 	

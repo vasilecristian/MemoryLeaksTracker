@@ -107,6 +107,7 @@ namespace mlt
 
 #if defined(_WIN32)
     #define	NEW new(__FILE__, __LINE__)
+	#define	new new(__FILE__, __LINE__)
 #else
     #define NEW	new
 #endif//_WIN32

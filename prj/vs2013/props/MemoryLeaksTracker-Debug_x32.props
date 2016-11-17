@@ -7,17 +7,18 @@
   <ClCompile>
     <PrecompiledHeader>NotUsing</PrecompiledHeader>
     <WarningLevel>Level3</WarningLevel>
-    <PreprocessorDefinitions>_DEBUG;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_WIN32_WINNT=0x0501;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
+    <PreprocessorDefinitions>_DEBUG;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_WIN32_WINNT=0x0601;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <AdditionalIncludeDirectories>..\..\include;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ProgramDataBaseFileName>$(OutDir)MemoryLeaksTracker_x86_d.pdb</ProgramDataBaseFileName>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>/wd4530 /we4715 /we4716 /Zc:inline %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4530 /we4715 /we4716 /we4150 /Zc:inline /Zm400 %(AdditionalOptions)</AdditionalOptions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -19,7 +19,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>/wd4530 /we4715 /we4716 /we4150 /Zc:inline /Zm400 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4530 /we4715 /we4716 /we4150 /Zm400 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
