@@ -26,3 +26,6 @@
 *.exe
 *.out
 *.app
+
+prj/xcode4/ios/obj/
+prj/xcode4/macos/obj/
