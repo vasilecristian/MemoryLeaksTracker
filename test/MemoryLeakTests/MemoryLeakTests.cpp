@@ -19,13 +19,13 @@ public:
 };
 
 A aa;
-static A* hh = NEW A();
+static A* hh = new A();
 
 void testFn1()
 {
     for (int i = 0; i < 100000; i++)
     {
-        int* test = NEW int(0);
+        int* test = new int(0);
         delete test;
     }
 }
@@ -33,7 +33,7 @@ void testFn1()
 
 int main(int argc, const char* argv[])
 {
-    int* test = NEW int(0);
+    int* test = new int(0);
     delete test;
 
     std::vector<std::thread> threads;
