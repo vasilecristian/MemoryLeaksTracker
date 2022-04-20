@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryLeakTests", "MemoryLeakTests.vcxproj", "{02C998F5-516F-4158-AFD3-93297A0FB7B3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryLeaksTracker", "..\..\prj\vs2013\MemoryLeaksTracker.vcxproj", "{3A25EAA2-2609-ABF8-8F69-A54B7B6C957A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryLeaksTracker", "..\..\prj\vs2019\MemoryLeaksTracker.vcxproj", "{3A25EAA2-2609-ABF8-8F69-A54B7B6C957A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
