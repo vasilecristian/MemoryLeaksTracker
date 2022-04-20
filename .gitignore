@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+*.pdb
+prj/vs2019/.vs/MemoryLeaksTracker/v16/.suo
+prj/vs2019/.vs/MemoryLeaksTracker/v16/Browse.VC.db
+*.tlog
+prj/vs2019/obj/x32/Debug/MemoryLeaksTracker.log
+prj/vs2019/obj/x32/Debug/MemoryLeaksTracker_x86_d.lib.recipe
+prj/vs2019/MemoryLeaksTracker.vcxproj.user
