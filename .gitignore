@@ -47,3 +47,11 @@ prj/vs2019/obj/x32/Debug/MemoryLeaksTracker.vcxproj.FileListAbsolute.txt
 test/MemoryLeakTests/Debug/MemoryLeakTests.vcxproj.FileListAbsolute.txt
 prj/xcode4/ios/obj/
 prj/xcode4/macos/obj/
+prj/vs2019/obj/x32/Release/MemoryLeaksTracker.log
+*.recipe
+prj/vs2019/obj/x64/Debug/MemoryLeaksTracker.log
+prj/vs2019/obj/x64/Release/MemoryLeaksTracker.log
+*.iobj
+*.ipdb
+test/MemoryLeakTests/Release/MemoryLeakTests.log
+test/MemoryLeakTests/Release/MemoryLeakTests.vcxproj.FileListAbsolute.txt
