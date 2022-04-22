@@ -6,9 +6,10 @@
 #include <thread>
 #include <vector>
 
+
 int a = 0;
 
-class A : public mlt::ILeakTracker
+class A : public mlt::BaseLeakTracker
 {
 public:
     A() :m_a(0), m_b(0)
@@ -33,8 +34,10 @@ void testFn1()
 
 int main(int argc, const char* argv[])
 {
+	mlt::Init();
+	
     int* test = new int(0);
-    delete test;
+    //delete test;
 
     std::vector<std::thread> threads;
     for (int i = 0; i < 50; i++)
@@ -47,8 +50,6 @@ int main(int argc, const char* argv[])
         thread.join();
     }
 
-    mlt::LeakTracker::PrintMemoryLeaks();
 	return 0;
 }
-
 

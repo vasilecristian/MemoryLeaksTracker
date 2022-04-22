@@ -1,12 +1,8 @@
 #ifndef __MEMORYLT_H_INCLUDED__
 #define __MEMORYLT_H_INCLUDED__
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || defined(DEBUG)
 
-#if defined(_WIN32) && !(defined(WINAPI_FAMILY) && ((WINAPI_FAMILY==WINAPI_FAMILY_APP) || (WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)))
-/** Enable the Stack trace tracking only for Win32|Debug platform (NOT WinPhone or WinStore)*/
-#define TRACK_STACK_TRACE
-#endif
 
 #include <atomic>
 #include <mutex>
@@ -16,6 +12,7 @@
 /// Is for Win32 and all windows platforms (including WinPhone & WinStore)
 #include <new>
 #include <exception>
+#endif //_WIN32
 
 /**
 * Global overrides of the new and delete operators for memory tracking.*/
@@ -35,22 +32,22 @@ void operator delete[](void* p, const char* file, int line) throw();
 #ifdef _MSC_VER
 #pragma warning( default : 4290 )
 #endif
-#endif //_WIN32
+
+void* RecordAlloc(const char* file, int line);
 
 namespace mlt
 {
-    typedef void*(*AllocFuncPtr)(unsigned int, const char*, unsigned int);
+    typedef void*(*AllocFuncPtr)(std::size_t, const char*, unsigned int);
     typedef void(*FreeFuncPtr)(void*);
 
     extern AllocFuncPtr s_allocFuncPtr;
-    extern FreeFuncPtr  s_FreeFuncPtr;
+    extern FreeFuncPtr  s_freeFuncPtr;
 
-    static void* AllocInit(unsigned int size, const char* file, unsigned int line);
-    static void* AllocInit2(unsigned int size, const char* file, unsigned int line);
-    static void* AllocNormal(unsigned int size, const char* file, unsigned int line);
-    static void* AllocShutdown(unsigned int size, const char* file, unsigned int line);
-    static void FreeNormal(void* mem);
-    static void FreeShutdown(void* mem);
+	void Init();
+	void* Alloc(std::size_t size, const char* file, unsigned int line);
+	void* AllocShutdown(std::size_t size, const char* file, unsigned int line);
+	void Free(void* mem);
+	void FreeShutdown(void* mem);
 
     struct MemoryAllocationRecord;
     class LeakTracker
@@ -64,76 +61,52 @@ namespace mlt
         /** Prints all heap and reference leaks to stderr. */
         static void PrintMemoryLeaks();
 
-        #if defined(TRACK_STACK_TRACE)
-        /** Sets whether stack traces are tracked on memory allocations or not.
-        * @param trackStackTrace Whether to track the stack trace on memory allocations.*/
-        static void SetTrackStackTrace(bool trackStackTrace);
-
-    private:
-        void PrintStackTrace(MemoryAllocationRecord* rec);
-        #endif //TRACK_STACK_TRACE
-
-
     private:
         MemoryAllocationRecord* m_memoryAllocations;
         int m_memoryAllocationCount;
         std::recursive_mutex m_m;
-        unsigned int m_maxSize;
+		std::size_t m_maxSize;
         std::size_t m_maxLine;
-
-        static std::atomic<bool> s_trackStackTrace;
     };
 
 	
 
-	class ILeakTracker
+	class BaseLeakTracker
 	{
 	public:
-		void* operator new(size_t size);
+		void* operator new(std::size_t size);
 		void operator delete(void* p);
 
-		void* operator new[](size_t size);
+		void* operator new[](std::size_t size);
 		void operator delete[](void* p);
 
-		void* operator new(size_t size, const char *file, int line);
+		void* operator new(std::size_t size, const char *file, int line);
 		void operator delete(void* p, const char *file, int line);
 
-		void* operator new[](size_t size, const char *file, int line);
+		void* operator new[](std::size_t size, const char *file, int line);
 		void operator delete[](void* p, const char *file, int line);
 	};
 
 } //namespace mlt
 
-
-#if defined(_WIN32)
-    //#define	NEW new(__FILE__, __LINE__)
-	#define	new new(__FILE__, __LINE__)
-#else
-    #define NEW	new
-#endif//_WIN32
-
-
+#define	new new(__FILE__, __LINE__)
 
 #else //!_DEBUG
 
-#include <iostream>
-
 namespace mlt
 {
-    class ILeakTracker
+	void Init(){}
+
+    class BaseLeakTracker
     {
     };
 
     class LeakTracker
     {
     public:
-        static void SetTrackStackTrace(bool trackStackTrace);
-		static void PrintMemoryLeaks();
+		static void PrintMemoryLeaks(){}
     };
 }
-
-/// just declare the NEW
-#define NEW	new  
 
 #endif //_DEBUG
 

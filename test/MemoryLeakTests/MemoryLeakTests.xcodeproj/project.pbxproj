@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		246A37C9281032D600B39A62 /* MemoryLeakTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 246A37C8281032D600B39A62 /* MemoryLeakTests.cpp */; };
-		246A37DB2810389700B39A62 /* libMemoryLeaksTracker_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 246A37D72810382C00B39A62 /* libMemoryLeaksTracker_d.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,7 +50,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				246A37DB2810389700B39A62 /* libMemoryLeaksTracker_d.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +59,7 @@
 		246A37B5281032B500B39A62 = {
 			isa = PBXGroup;
 			children = (
-				246A37D22810382C00B39A62 /* MemoryLeaksTracker.xcodeproj */,
+				24C92C062812C4F80025D391 /* Dependencies */,
 				246A37C8281032D600B39A62 /* MemoryLeakTests.cpp */,
 				246A37BF281032B500B39A62 /* Products */,
 				246A37DA2810389700B39A62 /* Frameworks */,
@@ -89,6 +87,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		24C92C062812C4F80025D391 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				246A37D22810382C00B39A62 /* MemoryLeaksTracker.xcodeproj */,
+			);
+			name = Dependencies;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -186,7 +192,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -245,7 +251,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -298,6 +304,7 @@
 				DEVELOPMENT_TEAM = BR67ND9EV8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = ../../include;
+				MACOSX_DEPLOYMENT_TARGET = 12.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -309,6 +316,7 @@
 				DEVELOPMENT_TEAM = BR67ND9EV8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = ../../include;
+				MACOSX_DEPLOYMENT_TARGET = 12.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
