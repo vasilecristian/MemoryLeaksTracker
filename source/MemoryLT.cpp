@@ -1,7 +1,7 @@
 
 #include "MemoryLeaksTracker/MemoryLT.h"
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || defined(DEBUG)
 
 /// Override (only for this file) the _HAS_EXCEPTIONS values. Otherwise a compile error is 
 /// generated (aka: error C3861: '__uncaught_exception': identifier not found)
@@ -23,8 +23,33 @@
 
 namespace mlt
 {
-	AllocFuncPtr s_allocFuncPtr = nullptr;
-    FreeFuncPtr  s_freeFuncPtr = nullptr;
+	void* Alloc(std::size_t size, const char* file, unsigned int line);
+	void* AllocShutdown(std::size_t size, const char* file, unsigned int line);
+	void Free(void* mem);
+	void FreeShutdown(void* mem);
+
+	struct MemoryAllocationRecord;
+	class LeakTracker
+	{
+	public:
+		LeakTracker();
+		~LeakTracker();
+		void* Alloc(std::size_t size, const char* file, unsigned int line);
+		void Free(void* p);
+
+		/** Prints all heap and reference leaks to stderr. */
+		static void PrintMemoryLeaks();
+
+	private:
+		MemoryAllocationRecord* m_memoryAllocations;
+		int m_memoryAllocationCount;
+		std::recursive_mutex m_m;
+		std::size_t m_maxSize;
+		std::size_t m_maxLine;
+	};
+
+	static AllocFuncPtr s_allocFuncPtr = nullptr;
+	static FreeFuncPtr  s_freeFuncPtr = nullptr;
 
     /** We reserve some memory to hold the mem for s_leakTracker */
     static char s_memleakTracker[sizeof(LeakTracker)] = { 0 };
@@ -32,9 +57,6 @@ namespace mlt
     /** Is the static pointer for leakTracker */
     static LeakTracker* s_leakTracker = nullptr;
 
-
-    /** Implement our first allocation function that constructs 
-    * our heap on first use. */
     void Init()
     {
         s_leakTracker = new(s_memleakTracker) LeakTracker;
@@ -42,8 +64,6 @@ namespace mlt
 		s_freeFuncPtr = Free;
     }
 
-    /** The normal allocator that runs after heap construction, and before
-    * its eventual destruction. */
     void* Alloc(std::size_t size, const char* file, unsigned int line)
     {
         return s_leakTracker->Alloc(size, file, line);
@@ -65,7 +85,6 @@ namespace mlt
 
 			s_leakTracker = nullptr;
 		}
-        // leakCheckReport();
     }
 
     void FreeShutdown(void* mem)

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		246A37C9281032D600B39A62 /* MemoryLeakTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 246A37C8281032D600B39A62 /* MemoryLeakTests.cpp */; };
+		24C92C10281317CA0025D391 /* libMemoryLeaksTracker_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 246A37D72810382C00B39A62 /* libMemoryLeaksTracker_d.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -18,7 +19,7 @@
 			remoteGlobalIDString = 5F420F587A8C888261517598;
 			remoteInfo = MemoryLeaksTracker;
 		};
-		246A37D82810383200B39A62 /* PBXContainerItemProxy */ = {
+		24C92C0E281315A00025D391 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 246A37D22810382C00B39A62 /* MemoryLeaksTracker.xcodeproj */;
 			proxyType = 1;
@@ -50,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24C92C10281317CA0025D391 /* libMemoryLeaksTracker_d.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,7 +113,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				246A37D92810383200B39A62 /* PBXTargetDependency */,
+				24C92C0F281315A00025D391 /* PBXTargetDependency */,
 			);
 			name = MemoryLeakTests;
 			productName = MemoryLeakTests;
@@ -178,10 +180,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		246A37D92810383200B39A62 /* PBXTargetDependency */ = {
+		24C92C0F281315A00025D391 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = MemoryLeaksTracker;
-			targetProxy = 246A37D82810383200B39A62 /* PBXContainerItemProxy */;
+			targetProxy = 24C92C0E281315A00025D391 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

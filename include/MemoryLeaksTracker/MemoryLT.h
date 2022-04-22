@@ -40,36 +40,8 @@ namespace mlt
     typedef void*(*AllocFuncPtr)(std::size_t, const char*, unsigned int);
     typedef void(*FreeFuncPtr)(void*);
 
-    extern AllocFuncPtr s_allocFuncPtr;
-    extern FreeFuncPtr  s_freeFuncPtr;
-
+	/** Initialize the LemoryLeackTracker*/
 	void Init();
-	void* Alloc(std::size_t size, const char* file, unsigned int line);
-	void* AllocShutdown(std::size_t size, const char* file, unsigned int line);
-	void Free(void* mem);
-	void FreeShutdown(void* mem);
-
-    struct MemoryAllocationRecord;
-    class LeakTracker
-    {      
-    public:
-        LeakTracker();
-        ~LeakTracker();
-        void* Alloc(std::size_t size, const char* file, unsigned int line);
-        void Free(void* p);
-
-        /** Prints all heap and reference leaks to stderr. */
-        static void PrintMemoryLeaks();
-
-    private:
-        MemoryAllocationRecord* m_memoryAllocations;
-        int m_memoryAllocationCount;
-        std::recursive_mutex m_m;
-		std::size_t m_maxSize;
-        std::size_t m_maxLine;
-    };
-
-	
 
 	class BaseLeakTracker
 	{
