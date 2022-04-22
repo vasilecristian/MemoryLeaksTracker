@@ -101,7 +101,7 @@ namespace mlt
     struct MemoryAllocationRecord
     {
         /**address returned to the caller after allocation*/
-        unsigned long m_address;         
+        void* m_address;
 
         /**size of the allocation request*/
 		std::size_t m_size;
@@ -151,7 +151,7 @@ namespace mlt
         mem += sizeof(MemoryAllocationRecord);
 
         m_m.lock();
-        rec->m_address = (unsigned long)mem;
+        rec->m_address = (void*)mem;
         rec->m_size = (unsigned int)size;
         rec->m_file = file;
         rec->m_line = line;
@@ -183,7 +183,7 @@ namespace mlt
         MemoryAllocationRecord* rec = (MemoryAllocationRecord*)mem;
 
         /// Sanity check: ensure that address in record matches passed in address
-        if (rec->m_address != (unsigned long)p)
+        if (rec->m_address != p)
         {
             //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong address).\n");
             //std::cout << "A";
@@ -240,7 +240,7 @@ namespace mlt
             {
                 if (strlen(rec->m_file) > 0)
                 {
-                    printf("[memory] LEAK: At address %d, size %d, %s:%d.\n", rec->m_address, rec->m_size, rec->m_file, rec->m_line);
+                    printf("[memory] LEAK: At address %#010x, size %zd, %s:%d.\n", (unsigned long)rec->m_address, rec->m_size, rec->m_file, rec->m_line);
                 }
                 rec = rec->m_next;
             }

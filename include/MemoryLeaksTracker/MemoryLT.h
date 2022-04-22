@@ -33,7 +33,6 @@ void operator delete[](void* p, const char* file, int line) throw();
 #pragma warning( default : 4290 )
 #endif
 
-void* RecordAlloc(const char* file, int line);
 
 namespace mlt
 {

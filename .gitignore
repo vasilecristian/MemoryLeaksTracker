@@ -55,3 +55,6 @@ prj/vs2019/obj/x64/Release/MemoryLeaksTracker.log
 *.ipdb
 test/MemoryLeakTests/Release/MemoryLeakTests.log
 test/MemoryLeakTests/Release/MemoryLeakTests.vcxproj.FileListAbsolute.txt
+prj/vs2019/obj/x64/Debug/MemoryLeaksTracker.vcxproj.FileListAbsolute.txt
+prj/vs2019/obj/x64/Debug/MemoryLeaksTracker_x64_d.Build.CppClean.log
+test/MemoryLeakTests/Debug/MemoryLeakTests.Build.CppClean.log
