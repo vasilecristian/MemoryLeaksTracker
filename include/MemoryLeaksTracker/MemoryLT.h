@@ -36,9 +36,6 @@ void operator delete[](void* p, const char* file, int line) throw();
 
 namespace mlt
 {
-    typedef void*(*AllocFuncPtr)(std::size_t, const char*, unsigned int);
-    typedef void(*FreeFuncPtr)(void*);
-
 	/** Initialize the LemoryLeackTracker*/
 	void Init();
 

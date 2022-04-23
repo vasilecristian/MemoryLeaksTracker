@@ -23,12 +23,35 @@
 
 namespace mlt
 {
-	void* Alloc(std::size_t size, const char* file, unsigned int line);
-	void* AllocShutdown(std::size_t size, const char* file, unsigned int line);
-	void Free(void* mem);
-	void FreeShutdown(void* mem);
+    typedef void* (*AllocFuncPtr)(std::size_t, const char*, unsigned int);
+    typedef void(*FreeFuncPtr)(void*);
 
-	struct MemoryAllocationRecord;
+    /** Allocates memory for usual usage*/
+	void* Alloc(std::size_t size, const char* file, unsigned int line);
+
+    /** Free memory for usual usage*/
+	void Free(void* mem);
+
+    struct MemoryAllocationRecord
+    {
+        /**address returned to the caller after allocation*/
+        void* m_address;
+
+        /**size of the allocation request*/
+        std::size_t m_size;
+
+        /**source file of allocation request*/
+        const char* m_file;
+
+        /**source line of the allocation request*/
+        unsigned int m_line;
+
+        /**linked list next node*/
+        MemoryAllocationRecord* m_next;
+        /**linked list prev node*/
+        MemoryAllocationRecord* m_prev;
+    };
+
 	class LeakTracker
 	{
 	public:
@@ -57,6 +80,7 @@ namespace mlt
     /** Is the static pointer for leakTracker */
     static LeakTracker* s_leakTracker = nullptr;
 
+
     void Init()
     {
         s_leakTracker = new(s_memleakTracker) LeakTracker;
@@ -69,54 +93,25 @@ namespace mlt
         return s_leakTracker->Alloc(size, file, line);
     }
 
-    /** Allocates memory during shutdown of the memory manager*/
-    void* AllocShutdown(std::size_t size, const char* file, unsigned int line)
-    {
-        return malloc(size);
-    }
-
     void LeakTrackerExit()
     {
+        s_allocFuncPtr = nullptr;
+        s_freeFuncPtr = nullptr;
+
 		if (s_leakTracker)
 		{
 			s_leakTracker->PrintMemoryLeaks();
 
-			s_leakTracker->~LeakTracker();
+            delete s_leakTracker;
 
 			s_leakTracker = nullptr;
 		}
-    }
-
-    void FreeShutdown(void* mem)
-    {
-        free(mem);
     }
 
     void Free(void* mem)
     {
         s_leakTracker->Free(mem);
     }
-
-
-    struct MemoryAllocationRecord
-    {
-        /**address returned to the caller after allocation*/
-        void* m_address;
-
-        /**size of the allocation request*/
-		std::size_t m_size;
-
-        /**source file of allocation request*/
-        const char* m_file;               
-
-        /**source line of the allocation request*/
-        unsigned int m_line;                       
-
-        /**linked list next node*/
-        MemoryAllocationRecord* m_next;
-        /**linked list prev node*/
-        MemoryAllocationRecord* m_prev;
-    };
 
 
     LeakTracker::LeakTracker() 
@@ -132,11 +127,6 @@ namespace mlt
 
     LeakTracker::~LeakTracker()
     {
-        s_allocFuncPtr = AllocShutdown;
-
-        // destruct your heap here
-
-        s_freeFuncPtr = FreeShutdown;
     }
 
     void* LeakTracker::Alloc(std::size_t size, const char* file, unsigned int line)
