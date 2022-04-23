@@ -34,10 +34,22 @@ void testFn1()
 
 int main(int argc, const char* argv[])
 {
-	mlt::Init();
+	mlt::Init(true);
 	
-    int* test = new int(0);
-    //delete test;
+    int* pointerToTest = new int(0);
+
+    // This will generate a heap corruption in a memory space after the "pointerToTest"'s allocated memory!
+    char* corruption1 = (char*)pointerToTest + 5;
+    *corruption1 = 1;
+
+    // This will generate a heap corruption in a memory space before the "pointerToTest"'s allocated memory!
+    char* corruption2 = (char*)pointerToTest - 25;
+    *corruption2 = 1;
+
+    // Commenting this delete call will generate a leak!
+    delete pointerToTest;
+
+    mlt::CheckHeapCorruption();
 
     std::vector<std::thread> threads;
     for (int i = 0; i < 50; i++)
@@ -50,6 +62,7 @@ int main(int argc, const char* argv[])
         thread.join();
     }
 
+    mlt::Close();
 	return 0;
 }
 

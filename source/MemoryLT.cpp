@@ -62,6 +62,9 @@ namespace mlt
 
 		/** Prints all heap and reference leaks to stderr. */
 		static void PrintMemoryLeaks();
+        static void CheckHeapCorruption();
+
+        void CheckHeapCorruptionAtAddress(void* address);
 
 	private:
 		MemoryAllocationRecord* m_memoryAllocations;
@@ -71,6 +74,9 @@ namespace mlt
 		std::size_t m_maxLine;
 	};
 
+    static std::mutex m_initMutex;
+    static bool s_heapCorruptionEnabled = false;
+    static int s_heapCorruptionBuferSize = 2048;
 	static AllocFuncPtr s_allocFuncPtr = nullptr;
 	static FreeFuncPtr  s_freeFuncPtr = nullptr;
 
@@ -81,11 +87,35 @@ namespace mlt
     static LeakTracker* s_leakTracker = nullptr;
 
 
-    void Init()
+    void Init(bool heapCorruptionCheck, int buffer)
     {
+        std::lock_guard<std::mutex> lk(m_initMutex);
+        s_heapCorruptionEnabled = heapCorruptionCheck;
+        s_heapCorruptionBuferSize = buffer;
         s_leakTracker = new(s_memleakTracker) LeakTracker;
         s_allocFuncPtr = Alloc;
 		s_freeFuncPtr = Free;
+    }
+
+    void Close()
+    {
+        std::lock_guard<std::mutex> lk(m_initMutex);
+        if (s_leakTracker)
+        {
+            s_leakTracker->PrintMemoryLeaks();
+            s_allocFuncPtr = nullptr;
+            s_freeFuncPtr = nullptr;
+            //delete s_leakTracker;
+            s_leakTracker = nullptr;
+        }
+    }
+
+    void CheckHeapCorruption()
+    {
+        if (!s_leakTracker)
+            return;
+
+        s_leakTracker->CheckHeapCorruption();
     }
 
     void* Alloc(std::size_t size, const char* file, unsigned int line)
@@ -101,10 +131,7 @@ namespace mlt
 		if (s_leakTracker)
 		{
 			s_leakTracker->PrintMemoryLeaks();
-
-            delete s_leakTracker;
-
-			s_leakTracker = nullptr;
+            s_leakTracker = nullptr;
 		}
     }
 
@@ -131,17 +158,44 @@ namespace mlt
 
     void* LeakTracker::Alloc(std::size_t size, const char* file, unsigned int line)
     {
-        /// Allocate memory + size for a MemoryAlloctionRecord
-        unsigned char* mem = (unsigned char*)malloc(size + sizeof(MemoryAllocationRecord));
+        if (file == nullptr)
+        {
+            return malloc(size);
+        }
 
-        /// Cast
-        MemoryAllocationRecord* rec = (MemoryAllocationRecord*)mem;
+        unsigned char* mem = nullptr;
+        MemoryAllocationRecord* rec = nullptr;
+        void* payloadAddr = nullptr;
 
-        /// Move memory pointer past record
-        mem += sizeof(MemoryAllocationRecord);
+        if (s_heapCorruptionEnabled)
+        {
+            /// Allocate memory in this format:
+            /// | heap corruption buffer | MemoryAllocationRecord | allocated memory of size | heap corruption buffe |
+            /// ^                        ^                        ^
+            /// mem                      rec                      payloadAddr
+            mem = (unsigned char*)calloc(sizeof(MemoryAllocationRecord) + size + s_heapCorruptionBuferSize *2, 1);
+            rec = (MemoryAllocationRecord*)(mem + s_heapCorruptionBuferSize);
+
+            /// Move memory pointer past record
+            payloadAddr = mem + s_heapCorruptionBuferSize + sizeof(MemoryAllocationRecord);
+        }
+        else
+        {
+            /// Allocate memory + size for a MemoryAlloctionRecord
+            /// | MemoryAllocationRecord | allocated memory of size |
+            /// ^                        ^
+            /// mem = rec                payloadAddr
+            mem = (unsigned char*)malloc(sizeof(MemoryAllocationRecord) + size);
+            rec = (MemoryAllocationRecord*)mem;
+
+            /// Move memory pointer past record
+            payloadAddr = mem + sizeof(MemoryAllocationRecord);
+        }
+
+        
 
         m_m.lock();
-        rec->m_address = (void*)mem;
+        rec->m_address = payloadAddr;
         rec->m_size = (unsigned int)size;
         rec->m_file = file;
         rec->m_line = line;
@@ -159,31 +213,44 @@ namespace mlt
         ++m_memoryAllocationCount;
 
         m_m.unlock();
-        return mem;
+        return payloadAddr;
     }
 
-    void LeakTracker::Free(void* p)
+    void LeakTracker::Free(void* payloadAddr)
     {
-        if (p == 0)
+        if (payloadAddr == 0)
             return;
 
-        /// Backup passed in pointer to access memory allocation record
-        void* mem = ((unsigned char*)p) - sizeof(MemoryAllocationRecord);
+        unsigned char* mem = nullptr;
+        MemoryAllocationRecord* rec = nullptr;
 
-        MemoryAllocationRecord* rec = (MemoryAllocationRecord*)mem;
+        if (s_heapCorruptionEnabled)
+        {
+            /// Backup passed in pointer to access memory allocation record
+            mem = ((unsigned char*)payloadAddr) - sizeof(MemoryAllocationRecord) - s_heapCorruptionBuferSize;
+
+            rec = (MemoryAllocationRecord*)(((unsigned char*)payloadAddr) - sizeof(MemoryAllocationRecord));
+        }
+        else
+        {
+            /// Backup passed in pointer to access memory allocation record
+            mem = ((unsigned char*)payloadAddr) - sizeof(MemoryAllocationRecord);
+
+            rec = (MemoryAllocationRecord*)mem;
+        }
 
         /// Sanity check: ensure that address in record matches passed in address
-        if (rec->m_address != p)
+        if (rec->m_address != payloadAddr)
         {
-            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong address).\n");
-            //std::cout << "A";
+            // This case could be a memory corruption, but most of the cases are memory allocations that was not tracked (because file was null).
+            free(payloadAddr);
             return;
         }
 
         /// Sanity check: ensure that size is smaller than maximum (tracked)
         if (rec->m_size > m_maxSize)
         {
-            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong size).\n");
+            std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong size).\n");
             //std::cout << "S";
             return;
         }
@@ -191,9 +258,14 @@ namespace mlt
         /// Sanity check: ensure that line is smaller than maximum (tracked)
         if (rec->m_line > m_maxLine)
         {
-            //std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong line).\n");
+            std::cout << ("[memory] CORRUPTION: Attempting to free memory address with invalid memory allocation record (wrong line).\n");
             //std::cout << "L";
             return;
+        }
+
+        if (s_heapCorruptionEnabled)
+        {
+            CheckHeapCorruptionAtAddress(payloadAddr);
         }
 
         /// Link this item out
@@ -226,6 +298,7 @@ namespace mlt
             printf("[memory] WARNING: %d  HEAP allocations still active in memory.\n", s_leakTracker->m_memoryAllocationCount);
 
 			MemoryAllocationRecord* rec = s_leakTracker->m_memoryAllocations;
+            
             while (rec)
             {
                 if (strlen(rec->m_file) > 0)
@@ -237,6 +310,50 @@ namespace mlt
         }
 
 		s_leakTracker->m_m.unlock();
+    }
+
+    void LeakTracker::CheckHeapCorruptionAtAddress(void* address)
+    {
+        /// Backup passed in pointer to access memory allocation record
+        unsigned char* mem = ((unsigned char*)address) - sizeof(MemoryAllocationRecord) - s_heapCorruptionBuferSize;
+
+        MemoryAllocationRecord* rec = (MemoryAllocationRecord*)(((unsigned char*)address) - sizeof(MemoryAllocationRecord));
+
+        unsigned char* addrStart = mem;
+        unsigned char* addrEnd = addrStart + s_heapCorruptionBuferSize;
+        for (; addrStart < addrEnd; addrStart++)
+        {
+            if (*addrStart != 0)
+            {
+                printf("[memory] CORRUPTION: before address %#010x, size %zd, %s:%d.\n", (unsigned long)rec->m_address, rec->m_size, rec->m_file, rec->m_line);
+                break;
+            }
+        }
+
+        addrStart = (unsigned char*)address + rec->m_size;
+        addrEnd = addrStart + s_heapCorruptionBuferSize;
+        for (; addrStart < addrEnd; addrStart++)
+        {
+            if (*addrStart != 0)
+            {
+                printf("[memory] CORRUPTION: after address %#010x, size %zd, %s:%d.\n", (unsigned long)rec->m_address, rec->m_size, rec->m_file, rec->m_line);
+            }
+        }
+    }
+
+    void LeakTracker::CheckHeapCorruption()
+    {
+        if (!s_heapCorruptionEnabled)
+            return;
+
+        MemoryAllocationRecord* rec = s_leakTracker->m_memoryAllocations;
+                      
+        while (rec)
+        {
+            s_leakTracker->CheckHeapCorruptionAtAddress(rec->m_address);
+
+            rec = rec->m_next;
+        }
     }
 } //mlt
 
@@ -261,22 +378,22 @@ void* operator new[](std::size_t size, const char* file, int line)
 
 void* operator new (std::size_t size) throw(std::bad_alloc)
 {
-	return operator new (size, "", 0);
+	return operator new (size, nullptr, 0);
 }
 
 void* operator new[](std::size_t size) throw(std::bad_alloc)
 {
-	return operator new (size, "", 0);
+	return operator new (size, nullptr, 0);
 }
 
 void* operator new (std::size_t size, const std::nothrow_t&) throw()
 {
-	return operator new (size, "", 0);
+	return operator new (size, nullptr, 0);
 }
 
 void* operator new[](std::size_t size, const std::nothrow_t&) throw()
 {
-	return operator new (size, "", 0);
+	return operator new (size, nullptr, 0);
 }
 
 void operator delete (void* p) throw()
@@ -321,7 +438,7 @@ namespace mlt
     void* BaseLeakTracker::operator new(size_t size)
 	{
 		if(mlt::s_allocFuncPtr)
-			return mlt::s_allocFuncPtr(size, "", 0);
+			return mlt::s_allocFuncPtr(size, nullptr, 0);
 		else
 			return malloc(size);
 	}
@@ -337,7 +454,7 @@ namespace mlt
     void* BaseLeakTracker::operator new[](size_t size)
 	{
 		if(mlt::s_allocFuncPtr)
-			return mlt::s_allocFuncPtr(size, "", 0);
+			return mlt::s_allocFuncPtr(size, nullptr, 0);
 		else
 			return malloc(size);
     }

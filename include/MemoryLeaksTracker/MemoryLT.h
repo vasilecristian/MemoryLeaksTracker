@@ -36,8 +36,10 @@ void operator delete[](void* p, const char* file, int line) throw();
 
 namespace mlt
 {
-	/** Initialize the LemoryLeackTracker*/
-	void Init();
+	/** Initialize the MemoryLeakTracker*/
+	void Init(bool heapCorruptionCheck = false, int buffer = 256);
+	void Close();
+	void CheckHeapCorruption();
 
 	class BaseLeakTracker
 	{
@@ -63,7 +65,9 @@ namespace mlt
 
 namespace mlt
 {
-	void Init(){}
+	void Init(bool heapCorruptionCheck = false, int buffer = 256){}
+	void Close() {}
+	void CheckHeapCorruption() {}
 
     class BaseLeakTracker
     {
