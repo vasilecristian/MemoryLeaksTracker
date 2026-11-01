@@ -1,0 +1,101 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Configure Debug",
+			"type": "shell",
+			"command": "cmake --preset debug",
+			"osx": {
+				"command": "cmake --preset debug -DCMAKE_OSX_ARCHITECTURES=$(uname -m)"
+			},
+			"windows": {
+				"command": "cmake --preset vs2022-x64"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Configure Release",
+			"type": "shell",
+			"command": "cmake --preset release",
+			"windows": {
+				"command": "cmake --preset vs2022-x64"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Debug",
+			"type": "shell",
+			"command": "cmake --build --preset debug",
+			"windows": {
+				"command": "cmake --build --preset vs2022-x64-debug"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc",
+				"$msCompile"
+			],
+			"dependsOn": "Configure Debug"
+		},
+		{
+			"label": "Build Release",
+			"type": "shell",
+			"command": "cmake --build --preset release",
+			"windows": {
+				"command": "cmake --build --preset vs2022-x64-release"
+			},
+			"group": "build",
+			"problemMatcher": [
+				"$gcc",
+				"$msCompile"
+			],
+			"dependsOn": "Configure Release"
+		},
+		{
+			"label": "Run Unit Tests",
+			"type": "shell",
+			"command": "ctest --preset debug",
+			"windows": {
+				"command": "ctest --preset vs2022-x64-debug"
+			},
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"dependsOn": "Build Debug"
+		},
+		{
+			"label": "Run Unit Tests (ASan)",
+			"type": "shell",
+			"command": "cmake --preset asan && cmake --build --preset asan && ctest --preset asan",
+			"osx": {
+				"command": "cmake --preset asan -DCMAKE_OSX_ARCHITECTURES=$(uname -m) && cmake --build --preset asan && ctest --preset asan"
+			},
+			"windows": {
+				"command": "echo The asan preset is for macOS and Linux only."
+			},
+			"group": "test",
+			"problemMatcher": [
+				"$gcc"
+			]
+		},
+		{
+			"label": "Run Unit Tests (TSan)",
+			"type": "shell",
+			"command": "cmake --preset tsan && cmake --build --preset tsan && ctest --preset tsan",
+			"osx": {
+				"command": "cmake --preset tsan -DCMAKE_OSX_ARCHITECTURES=$(uname -m) && cmake --build --preset tsan && ctest --preset tsan"
+			},
+			"windows": {
+				"command": "echo The tsan preset is for macOS and Linux only."
+			},
+			"group": "test",
+			"problemMatcher": [
+				"$gcc"
+			]
+		}
+	]
+}

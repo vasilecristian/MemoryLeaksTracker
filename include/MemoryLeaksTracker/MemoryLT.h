@@ -25,88 +25,92 @@
 //
 // Author: Cristian Vasile
 //--------------------------------------------------------------------------------
-#ifndef __MEMORYLT_H_INCLUDED__
-#define __MEMORYLT_H_INCLUDED__
+#ifndef MEMORYLT_H_INCLUDED
+#define MEMORYLT_H_INCLUDED
 
+/// Usage notes:
+///  - Include this header LAST in every .cpp file. When the tracker is enabled it defines `new`
+///    as a macro, which breaks any header included after it that uses placement new (most
+///    standard library headers do).
+///  - Only `new` expressions in files that include this header are recorded with their file and
+///    line. Standard library allocations (containers, std::make_shared, ...), malloc(), and code
+///    that does not include this header are not recorded.
+///  - Because `new` is a macro, `new (buffer) T` and `new (std::nothrow) T` do not compile after
+///    this header. Wrap such code like this:
+///        #pragma push_macro("new")
+///        #undef new
+///        ...
+///        #pragma pop_macro("new")
+///  - The tracker is enabled when MLT_ENABLED is 1. When MLT_ENABLED is not defined, it is enabled
+///    if _DEBUG or DEBUG is defined. Build the library and the code that uses it with the same value.
+
+#include <cstddef>
+
+#if !defined(MLT_ENABLED)
 #if defined(_DEBUG) || defined(DEBUG)
+#define MLT_ENABLED 1
+#else
+#define MLT_ENABLED 0
+#endif
+#endif //!MLT_ENABLED
 
+#if MLT_ENABLED
 
-#include <atomic>
-#include <mutex>
-
-
-#if defined(_WIN32)
-/// Is for Win32 and all windows platforms (including WinPhone & WinStore)
 #include <new>
-#include <exception>
-#endif //_WIN32
 
-/**
-* Global overrides of the new and delete operators for memory tracking.*/
-#ifdef _MSC_VER
-#pragma warning( disable : 4290 ) // C++ exception specification ignored.
-#endif
-void* operator new (std::size_t size, const char* file, int line);
+/** Allocation forms used by the `new` macro below. They record the file and line of the allocation. */
+void* operator new(std::size_t size, const char* file, int line);
 void* operator new[](std::size_t size, const char* file, int line);
-void* operator new (std::size_t size) throw(std::bad_alloc);
-void* operator new[](std::size_t size) throw(std::bad_alloc);
-void* operator new (std::size_t size, const std::nothrow_t&) throw();
-void* operator new[](std::size_t size, const std::nothrow_t&) throw();
-void operator delete (void* p) throw();
-void operator delete[](void* p) throw();
-void operator delete (void* p, const char* file, int line) throw();
-void operator delete[](void* p, const char* file, int line) throw();
-#ifdef _MSC_VER
-#pragma warning( default : 4290 )
-#endif
 
+/** Called only when a constructor throws inside a `new(file, line)` expression. */
+void operator delete(void* p, const char* file, int line) noexcept;
+void operator delete[](void* p, const char* file, int line) noexcept;
 
 namespace mlt
 {
-	/** Initialize the MemoryLeakTracker*/
+	/** Starts recording the allocations made through the `new` macro. Thread-safe.
+	* Calling it again only changes the settings used for new allocations; recorded ones are kept.
+	* @param heapCorruptionCheck when true, every recorded allocation gets a guard area on each side,
+	*        checked on delete and by CheckHeapCorruption().
+	* @param buffer size in bytes of each guard area. Rounded up to a multiple of 16, at least 16,
+	*        at most 1 MiB. */
 	void Init(bool heapCorruptionCheck = false, int buffer = 256);
+
+	/** Prints the recorded allocations that are still alive and stops recording new ones.
+	* Recorded memory can still be deleted safely after Close(). Called automatically at exit
+	* if the program does not call it. Thread-safe. */
 	void Close();
+
+	/** Checks every recorded allocation that is still alive and reports damage around it. Thread-safe. */
 	void CheckHeapCorruption();
 
-	class BaseLeakTracker
-	{
-	public:
-		void* operator new(std::size_t size);
-		void operator delete(void* p);
+	/** @return the number of recorded allocations that are still alive. */
+	std::size_t GetActiveAllocationCount();
 
-		void* operator new[](std::size_t size);
-		void operator delete[](void* p);
-
-		void* operator new(std::size_t size, const char *file, int line);
-		void operator delete(void* p, const char *file, int line);
-
-		void* operator new[](std::size_t size, const char *file, int line);
-		void operator delete[](void* p, const char *file, int line);
-	};
+	/** @return the number of heap corruptions and invalid deletes detected since the program started. */
+	std::size_t GetCorruptionCount();
 
 } //namespace mlt
 
-#define	new new(__FILE__, __LINE__)
+#define new new(__FILE__, __LINE__)
 
-#else //!_DEBUG
+#else //!MLT_ENABLED
 
 namespace mlt
 {
-	void Init(bool heapCorruptionCheck = false, int buffer = 256){}
-	void Close() {}
-	void CheckHeapCorruption() {}
+	inline void Init(bool = false, int = 256) {}
+	inline void Close() {}
+	inline void CheckHeapCorruption() {}
+	inline std::size_t GetActiveAllocationCount() { return 0; }
+	inline std::size_t GetCorruptionCount() { return 0; }
 
-    class BaseLeakTracker
-    {
-    };
+	class LeakTracker
+	{
+	public:
+		static void PrintMemoryLeaks() {}
+	};
+} //namespace mlt
 
-    class LeakTracker
-    {
-    public:
-		static void PrintMemoryLeaks(){}
-    };
-}
+#endif //MLT_ENABLED
 
-#endif //_DEBUG
-
-#endif //__MEMORYLT_H_INCLUDED__
+#endif //MEMORYLT_H_INCLUDED

@@ -50,3 +50,6 @@ test/MemoryLeakTests/.vs/
 prj/vs2019/.vs/
 prj/vs2019/MemoryLeaksTracker.vcxproj.user
 test/MemoryLeakTests/MemoryLeakTests.vcxproj.user
+
+# CMake build folders
+build/

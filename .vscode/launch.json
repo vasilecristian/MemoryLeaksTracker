@@ -1,0 +1,41 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Unit Tests (macOS/Linux)",
+			"type": "lldb",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/debug/test/MemoryLTTests_cpp11",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"preLaunchTask": "Build Debug"
+		},
+		{
+			"name": "Debug Unit Tests (Windows)",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/vs2022-x64/test/Debug/MemoryLTTests_cpp11.exe",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"preLaunchTask": "Build Debug"
+		},
+		{
+			"name": "Debug Demo (macOS/Linux)",
+			"type": "lldb",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/debug/test/MemoryLeakDemo",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"preLaunchTask": "Build Debug"
+		},
+		{
+			"name": "Debug Demo (Windows)",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/vs2022-x64/test/Debug/MemoryLeakDemo.exe",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"preLaunchTask": "Build Debug"
+		}
+	]
+}

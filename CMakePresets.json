@@ -1,0 +1,101 @@
+{
+	"version": 3,
+	"cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+	"configurePresets": [
+		{
+			"name": "base",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/build/${presetName}"
+		},
+		{
+			"name": "ninja-base",
+			"hidden": true,
+			"inherits": "base",
+			"generator": "Ninja",
+			"condition": { "type": "notEquals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+				"CMAKE_OSX_DEPLOYMENT_TARGET": "12.2"
+			}
+		},
+		{
+			"name": "debug",
+			"displayName": "macOS/Linux - Debug (tracker on)",
+			"inherits": "ninja-base",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+		},
+		{
+			"name": "release",
+			"displayName": "macOS/Linux - Release (tracker off, universal arm64 + x86_64 on macOS)",
+			"inherits": "ninja-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+			}
+		},
+		{
+			"name": "asan",
+			"displayName": "macOS/Linux - Debug + AddressSanitizer/UndefinedBehaviorSanitizer",
+			"inherits": "debug",
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all"
+			}
+		},
+		{
+			"name": "tsan",
+			"displayName": "macOS/Linux - Debug + ThreadSanitizer",
+			"inherits": "debug",
+			"cacheVariables": { "CMAKE_CXX_FLAGS": "-fsanitize=thread" }
+		},
+		{
+			"name": "xcode",
+			"displayName": "macOS - Xcode project (universal arm64 + x86_64)",
+			"inherits": "base",
+			"generator": "Xcode",
+			"condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
+			"cacheVariables": {
+				"CMAKE_OSX_DEPLOYMENT_TARGET": "12.2",
+				"CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+			}
+		},
+		{
+			"name": "vs2022-x64",
+			"displayName": "Windows - Visual Studio 2022, x64",
+			"inherits": "base",
+			"generator": "Visual Studio 17 2022",
+			"architecture": { "value": "x64", "strategy": "set" },
+			"condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+		},
+		{
+			"name": "vs2022-win32",
+			"displayName": "Windows - Visual Studio 2022, Win32",
+			"inherits": "vs2022-x64",
+			"architecture": { "value": "Win32", "strategy": "set" }
+		}
+	],
+	"buildPresets": [
+		{ "name": "debug", "configurePreset": "debug" },
+		{ "name": "release", "configurePreset": "release" },
+		{ "name": "asan", "configurePreset": "asan" },
+		{ "name": "tsan", "configurePreset": "tsan" },
+		{ "name": "xcode-debug", "configurePreset": "xcode", "configuration": "Debug" },
+		{ "name": "xcode-release", "configurePreset": "xcode", "configuration": "Release" },
+		{ "name": "vs2022-x64-debug", "configurePreset": "vs2022-x64", "configuration": "Debug" },
+		{ "name": "vs2022-x64-release", "configurePreset": "vs2022-x64", "configuration": "Release" },
+		{ "name": "vs2022-win32-debug", "configurePreset": "vs2022-win32", "configuration": "Debug" },
+		{ "name": "vs2022-win32-release", "configurePreset": "vs2022-win32", "configuration": "Release" }
+	],
+	"testPresets": [
+		{ "name": "test-base", "hidden": true, "output": { "outputOnFailure": true } },
+		{ "name": "debug", "inherits": "test-base", "configurePreset": "debug" },
+		{ "name": "release", "inherits": "test-base", "configurePreset": "release" },
+		{ "name": "asan", "inherits": "test-base", "configurePreset": "asan" },
+		{ "name": "tsan", "inherits": "test-base", "configurePreset": "tsan" },
+		{ "name": "xcode-debug", "inherits": "test-base", "configurePreset": "xcode", "configuration": "Debug" },
+		{ "name": "xcode-release", "inherits": "test-base", "configurePreset": "xcode", "configuration": "Release" },
+		{ "name": "vs2022-x64-debug", "inherits": "test-base", "configurePreset": "vs2022-x64", "configuration": "Debug" },
+		{ "name": "vs2022-x64-release", "inherits": "test-base", "configurePreset": "vs2022-x64", "configuration": "Release" },
+		{ "name": "vs2022-win32-debug", "inherits": "test-base", "configurePreset": "vs2022-win32", "configuration": "Debug" },
+		{ "name": "vs2022-win32-release", "inherits": "test-base", "configurePreset": "vs2022-win32", "configuration": "Release" }
+	]
+}

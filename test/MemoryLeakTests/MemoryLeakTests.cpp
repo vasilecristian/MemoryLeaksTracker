@@ -1,15 +1,16 @@
 // MemoryLeakTests.cpp : Defines the entry point for the console application.
 //
 
-#include "MemoryLeaksTracker/MemoryLT.h"
-
 #include <thread>
 #include <vector>
+
+// Include MemoryLT.h last: in debug builds it defines `new` as a macro.
+#include "MemoryLeaksTracker/MemoryLT.h"
 
 
 int a = 0;
 
-class A : public mlt::BaseLeakTracker
+class A
 {
 public:
     A() :m_a(0), m_b(0)

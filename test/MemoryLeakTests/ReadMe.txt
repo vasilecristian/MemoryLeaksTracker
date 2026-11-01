@@ -1,40 +1,14 @@
-========================================================================
-    CONSOLE APPLICATION : MemoryLeakTests Project Overview
-========================================================================
+MemoryLeakTests - demo program for MemoryLeaksTracker
+=====================================================
 
-AppWizard has created this MemoryLeakTests application for you.
+MemoryLeakTests.cpp shows what the tracker reports in a debug build:
+  - a write after the end of a block    -> "[memory] CORRUPTION: after address ..."
+  - a write before the start of a block -> "[memory] CORRUPTION: before address ..."
+  - 50 threads that allocate and delete at the same time
+  - comment out "delete pointerToTest;" to see a leak report
 
-This file contains a summary of what you will find in each of the files that
-make up your MemoryLeakTests application.
+It only prints. It has no checks of its own.
+The unit tests are in ../UnitTests (build them with CMake, see ../../README.md).
 
-
-MemoryLeakTests.vcxproj
-    This is the main project file for VC++ projects generated using an Application Wizard.
-    It contains information about the version of Visual C++ that generated the file, and
-    information about the platforms, configurations, and project features selected with the
-    Application Wizard.
-
-MemoryLeakTests.vcxproj.filters
-    This is the filters file for VC++ projects generated using an Application Wizard. 
-    It contains information about the association between the files in your project 
-    and the filters. This association is used in the IDE to show grouping of files with
-    similar extensions under a specific node (for e.g. ".cpp" files are associated with the
-    "Source Files" filter).
-
-MemoryLeakTests.cpp
-    This is the main application source file.
-
-/////////////////////////////////////////////////////////////////////////////
-Other standard files:
-
-StdAfx.h, StdAfx.cpp
-    These files are used to build a precompiled header (PCH) file
-    named MemoryLeakTests.pch and a precompiled types file named StdAfx.obj.
-
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
-
-AppWizard uses "TODO:" comments to indicate parts of the source code you
-should add to or customize.
-
-/////////////////////////////////////////////////////////////////////////////
+Do not run it in a release build: the tracker is off there, so its
+out-of-bounds writes are real heap corruption.
